@@ -1,13 +1,8 @@
-import BookSearch from '@/components/BookSearch'
+import BookSearch from '@/components/book-search'
 
 export default function Home() {
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-fixed"
-      style={{
-        backgroundImage: "url('/trinitycollege-library.jpg')"
-      }}
-    >
+    <div className="trinity-bg">
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-6xl text-center mb-8 text-amber-200 font-bold drop-shadow-2xl">
           TRINITY COLLEGE LIBRARY
@@ -21,3 +16,4 @@ export default function Home() {
     </div>
   )
 }
+                                        

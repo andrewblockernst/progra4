@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@/test/utils/test-utils'
+import { render, screen, fireEvent } from '@/test/utils/test-utils'
 import { useState } from 'react'
 
 // Mock correcto - debe coincidir con donde está el archivo actions

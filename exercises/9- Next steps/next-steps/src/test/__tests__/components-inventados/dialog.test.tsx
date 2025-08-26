@@ -1,19 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@/test/utils/test-utils'
 
-// Mock simple del modal
-function SimpleModal({ isOpen, onClose, children }: any) {
+// Mock simple del dialog
+function SimpleDialog({ isOpen, onClose, children }: any) {
   if (!isOpen) return null
   
   return (
-    <div role="dialog" data-testid="modal">
+    <div role="dialog" data-testid="dialog">
       <button onClick={onClose}>Close</button>
       <div>{children}</div>
     </div>
   )
 }
 
-describe('Modal Component', () => {
+describe('Dialog Component', () => {
   const mockOnClose = vi.fn()
 
   beforeEach(() => {
@@ -22,30 +22,30 @@ describe('Modal Component', () => {
 
   it('should not render when closed', () => {
     render(
-      <SimpleModal isOpen={false} onClose={mockOnClose}>
-        <p>Modal content</p>
-      </SimpleModal>
+      <SimpleDialog isOpen={false} onClose={mockOnClose}>
+        <p>Dialog content</p>
+      </SimpleDialog>
     )
     
-    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument()
   })
 
   it('should render when open', () => {
     render(
-      <SimpleModal isOpen={true} onClose={mockOnClose}>
-        <p>Modal content</p>
-      </SimpleModal>
+      <SimpleDialog isOpen={true} onClose={mockOnClose}>
+        <p>Dialog content</p>
+      </SimpleDialog>
     )
     
-    expect(screen.getByTestId('modal')).toBeInTheDocument()
-    expect(screen.getByText('Modal content')).toBeInTheDocument()
+    expect(screen.getByTestId('dialog')).toBeInTheDocument()
+    expect(screen.getByText('Dialog content')).toBeInTheDocument()
   })
 
   it('should call onClose when close button clicked', () => {
     render(
-      <SimpleModal isOpen={true} onClose={mockOnClose}>
+      <SimpleDialog isOpen={true} onClose={mockOnClose}>
         <p>Modal content</p>
-      </SimpleModal>
+      </SimpleDialog>
     )
     
     const closeButton = screen.getByText('Close')

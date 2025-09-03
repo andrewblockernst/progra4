@@ -1,4 +1,5 @@
-name: docker-build-and-push
+name: Docker Build & Deploy
+
 on:
   push:
     branches: [ main, master ]

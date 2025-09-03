@@ -1,4 +1,4 @@
-name: pre-buildeada
+name: Build Check
 
 on:
   pull_request:
@@ -37,7 +37,7 @@ jobs:
     - name: Verificar que build fue exitoso
       run: |
         if [ ! -d ".next" ]; then
-          echo "Bob el constructor no pudo buildear nada - carpeta .next no existe"
+          echo "❌ Error: Build falló - carpeta .next no existe"
           exit 1
         fi
-        echo "Que grande! Bob el constructor buildeó la app"
+        echo "✅ Build exitoso"

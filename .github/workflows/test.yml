@@ -1,4 +1,4 @@
-name: test-en-pull-request
+name: Tests
 
 on:
   pull_request:
@@ -41,8 +41,8 @@ jobs:
       with:
         recreate: true
         message: |
-          ## tests-results  
+          ## 📊 Resultados de Tests
           
-          Los tests funcionaron re bien...
+          ✅ Todos los tests pasaron exitosamente
           
           Ver detalles en la pestaña "Actions" arriba.

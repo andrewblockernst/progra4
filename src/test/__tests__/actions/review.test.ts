@@ -19,10 +19,10 @@ describe('Book Actions (Real)', () => {
       ]
     };
 
-    global.fetch = vi.fn().mockResolvedValue({
+    (global.fetch as unknown) = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockResponse
-    }) as any;
+    });
 
     const result = await fetchBooks('test query');
     expect(global.fetch).toHaveBeenCalledWith(

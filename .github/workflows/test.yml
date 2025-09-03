@@ -6,8 +6,6 @@ on:
   push:
     branches: [ main, master ]
 
-# Grant the minimum permissions required for uploading coverage and commenting on PRs.
-# If you prefer to use a PAT for commenting, set it in a secret and change the action inputs.
 permissions:
   contents: read
   pull-requests: write

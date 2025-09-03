@@ -18,7 +18,7 @@ WORKDIR /app
 # Copiar dependencias desde etapa anterior
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copiar código fuente
+
 COPY . .
 
 # Variables de entorno para build

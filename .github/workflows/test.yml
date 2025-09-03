@@ -41,8 +41,8 @@ jobs:
       with:
         recreate: true
         message: |
-          ## 📊 Resultados de Tests
+          ## Resultados de Tests
           
-          ✅ Todos los tests pasaron exitosamente
+          Todos los tests pasaron exitosamente
           
           Ver detalles en la pestaña "Actions" arriba.

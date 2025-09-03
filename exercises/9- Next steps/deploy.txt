@@ -1,0 +1,2 @@
+url-pagina-deployada: https://trinitycollegelibrary.vercel.app/
+repositorio-nuevo-para-deploy: https://github.com/andrewblockernst/deploy-trinitycollegelibrary

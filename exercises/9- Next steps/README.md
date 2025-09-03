@@ -31,3 +31,4 @@ Principal: **Google Books API**
 - Utilizar vitest en conjunto con testing-library para esto.
 - Asegurense de probar todos los edge cases.
 - Distinguir claramente qué debe ser mockeado y qué debe probarse directamente.
+

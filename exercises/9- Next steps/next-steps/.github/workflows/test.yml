@@ -1,0 +1,48 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Instalar dependencias
+      run: npm ci
+      
+    - name: Ejecutar tests
+      run: npm run test:run
+      
+    - name: Ejecutar tests con cobertura
+      run: npm run test:coverage
+      
+    - name: Subir cobertura a Codecov
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        file: ./coverage/lcov.info
+        
+    - name: Comentar resultados en PR
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        message: |
+          ## 📊 Resultados de Tests
+          
+          ✅ Todos los tests pasaron exitosamente
+          
+          Ver detalles en la pestaña "Actions" arriba.

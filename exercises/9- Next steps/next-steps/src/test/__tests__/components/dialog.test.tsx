@@ -136,4 +136,26 @@ describe('BookModal (Real Component)', () => {
       expect(defaultProps.onClose).toHaveBeenCalled()
     }
   })
+
+  it('should cancel review form', async () => {
+    render(<BookModal {...defaultProps} />)
+    
+    // Click para mostrar formulario
+    const writeReviewBtn = screen.getByText('Escribir Quote')
+    fireEvent.click(writeReviewBtn)
+    
+    // Asegurarse de que el formulario está visible
+    await waitFor(() => {
+      expect(screen.getByTestId('review-cancel-btn')).toBeInTheDocument()
+    })
+    
+    // Click en el botón de cancelar (puede haber múltiples, así que usamos getAllByText)
+    const cancelButtons = screen.getAllByText('Cancelar');
+    expect(cancelButtons.length).toBeGreaterThan(0);
+    // O interactúa con el primero:
+    fireEvent.click(cancelButtons[0]);
+    
+    // Debería volver al texto original
+    expect(screen.getByTestId('Escribir Quote')).toBeInTheDocument()
+  })
 })

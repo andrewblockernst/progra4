@@ -24,7 +24,7 @@ export default function SearchResults({ books, query, isPending }: SearchResults
             <div className="text-center py-12 bg-amber-50/80 backdrop-blur-sm rounded-lg border border-amber-200">
                 <div className="text-6xl mb-4">📚</div>
                 <p className="text-xl text-amber-700 font-semibold mb-2">
-                    No se encontraron libros para "{query}"
+                    No se encontraron libros para &quot;{query}&quot;
                 </p>
                 <p className="text-amber-600">
                     Intenta con otros términos de búsqueda o revisa los ejemplos

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { GoogleBookItem, Review } from '@/types/book'
 import { getBookReviews, fetchBookById } from '@/app/actions/reviews.action'
 import { X, Star, Pen, ChevronDown, ChevronUp } from 'lucide-react'
@@ -22,6 +22,31 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
     const [isLoadingBook, setIsLoadingBook] = useState(false)
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
 
+    const loadBookDetails = useCallback(async () => {
+        setIsLoadingBook(true)
+        try {
+            const bookDetails = await fetchBookById(book.id)
+            setDetailedBook(bookDetails)
+        } catch (error) {
+            console.error('Error loading book details:', error)
+            setDetailedBook(book) // Fallback to original book data
+        } finally {
+            setIsLoadingBook(false)
+        }
+    }, [book])
+
+    const loadReviews = useCallback(async () => {
+        setIsLoadingReviews(true)
+        try {
+            const bookReviews = await getBookReviews(book.id)
+            setReviews(bookReviews)
+        } catch (error) {
+            console.error('Error loading reviews:', error)
+        } finally {
+            setIsLoadingReviews(false)
+        }
+    }, [book.id])
+
     useEffect(() => {
         if (isOpen) {
             loadBookDetails()
@@ -34,32 +59,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
         return () => {
             document.body.style.overflow = 'unset'
         }
-    }, [isOpen, book.id])
-
-    const loadBookDetails = async () => {
-        setIsLoadingBook(true)
-        try {
-            const bookDetails = await fetchBookById(book.id)
-            setDetailedBook(bookDetails)
-        } catch (error) {
-            console.error('Error loading book details:', error)
-            setDetailedBook(book) // Fallback to original book data
-        } finally {
-            setIsLoadingBook(false)
-        }
-    }
-
-    const loadReviews = async () => {
-        setIsLoadingReviews(true)
-        try {
-            const bookReviews = await getBookReviews(book.id)
-            setReviews(bookReviews)
-        } catch (error) {
-            console.error('Error loading reviews:', error)
-        } finally {
-            setIsLoadingReviews(false)
-        }
-    }
+    }, [isOpen, book.id, loadBookDetails, loadReviews])
 
     const calculateAverageRating = () => {
         if (reviews.length === 0) return 0

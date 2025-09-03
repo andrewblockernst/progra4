@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@/test/utils/test-utils'
 import BookSearch from '@/components/book-search'
 import * as actions from '@/app/actions/fetch.action'
 
 // Mock de las actions reales
 vi.mock('@/app/actions', () => ({
-  fetchBooks: vi.fn()
-}))
+  fetchBooks: vi.fn(),
+}));
 
-const mockFetchBooks = vi.mocked(actions.fetchBooks)
+const mockFetchBooks = actions.fetchBooks as Mock
+mockFetchBooks.mockResolvedValue([])
 
 describe('BookSearch (Real Component)', () => {
   beforeEach(() => {
@@ -40,8 +41,6 @@ describe('BookSearch (Real Component)', () => {
   })
 
   it('should call fetchBooks when searching', async () => {
-    mockFetchBooks.mockResolvedValue([])
-    
     render(<BookSearch />)
     
     // Busca input de búsqueda

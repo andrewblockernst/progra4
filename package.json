@@ -6,5 +6,11 @@
   "devDependencies": {
     "@types/sqlstring": "^2.3.2",
     "@types/validator": "^13.15.1"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   }
 }

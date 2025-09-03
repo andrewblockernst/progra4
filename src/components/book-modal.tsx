@@ -261,6 +261,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                             <button
                                 onClick={() => setShowReviewForm(!showReviewForm)}
                                 className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md hover:shadow-lg flex items-center gap-2"
+                                data-testid={showReviewForm ? 'cancel-review-btn' : 'write-review-btn'}
                             >
                                 <Pen size={20} />
                                 {showReviewForm ? 'Cancelar' : 'Escribir Quote'}

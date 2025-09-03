@@ -1,19 +1,19 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@/test/utils/test-utils'
 import BookSearch from '@/components/book-search'
-import * as actions from '@/app/actions/fetch.action'
+import { fetchBooks } from '@/app/actions/fetch.action'
 
 // Mock de las actions reales
-vi.mock('@/app/actions', () => ({
+vi.mock('@/app/actions/fetch.action', () => ({
   fetchBooks: vi.fn(),
 }));
 
-const mockFetchBooks = actions.fetchBooks as Mock
-mockFetchBooks.mockResolvedValue([])
+const mockFetchBooks = fetchBooks as Mock
 
 describe('BookSearch (Real Component)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockFetchBooks.mockResolvedValue([])
   })
 
   it('should render search form', () => {

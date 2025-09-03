@@ -74,45 +74,44 @@ describe('BookModal (Real Component)', () => {
     expect(screen.getByText('Escribir Quote')).toBeInTheDocument()
   })
 
-  it('should toggle review form', () => {
+  it('should toggle review form', async () => {
     render(<BookModal {...defaultProps} />)
     
     // Click para mostrar formulario
-    const writeReviewBtn = screen.getByText('Escribir Quote')
+    const writeReviewBtn = screen.getByTestId('write-review-btn')
     fireEvent.click(writeReviewBtn)
     
-    // Debería cambiar el texto del botón
-    expect(screen.getByText('Cancelar')).toBeInTheDocument()
+    // Esperar a que aparezca el botón de cancelar
+    await waitFor(() => {
+      expect(screen.getByTestId('cancel-review-btn')).toBeInTheDocument()
+    })
     
     // Click para ocultar formulario
-    const cancelBtn = screen.getByText('Cancelar')
+    const cancelBtn = screen.getByTestId('cancel-review-btn')
     fireEvent.click(cancelBtn)
     
     // Debería volver al texto original
-    expect(screen.getByText('Escribir Quote')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTestId('write-review-btn')).toBeInTheDocument()
+    })
   })
 
   it('should toggle review form (alternative approach)', async () => {
     render(<BookModal {...defaultProps} />)
     
     // Verificar estado inicial
-    expect(screen.getByText('Escribir Quote')).toBeInTheDocument()
+    expect(screen.getByTestId('write-review-btn')).toBeInTheDocument()
     
     // Click para mostrar formulario
-    const writeReviewBtn = screen.getByText('Escribir Quote')
+    const writeReviewBtn = screen.getByTestId('write-review-btn')
     fireEvent.click(writeReviewBtn)
     
     // Buscar indicadores de que el formulario está activo
     await waitFor(() => {
-      // El botón podría cambiar a cualquiera de estos textos
-      const possibleCancelTexts = ['Cancelar', 'Cancel', 'Cerrar', 'X']
-      const foundCancel = possibleCancelTexts.some(text => 
-        screen.queryByText(text) !== null
-      )
-      expect(foundCancel).toBe(true)
+      expect(screen.getByTestId('cancel-review-btn')).toBeInTheDocument()
     })
     
-    // O verificar que aparecieron elementos de formulario
+    // También verificar que aparecieron elementos de formulario
     await waitFor(() => {
       const formElements = document.querySelectorAll('textarea, input[type="text"]')
       expect(formElements.length).toBeGreaterThan(0)
@@ -141,7 +140,7 @@ describe('BookModal (Real Component)', () => {
     render(<BookModal {...defaultProps} />)
     
     // Click para mostrar formulario
-    const writeReviewBtn = screen.getByText('Escribir Quote')
+    const writeReviewBtn = screen.getByTestId('write-review-btn')
     fireEvent.click(writeReviewBtn)
     
     // Asegurarse de que el formulario está visible
@@ -149,13 +148,13 @@ describe('BookModal (Real Component)', () => {
       expect(screen.getByTestId('review-cancel-btn')).toBeInTheDocument()
     })
     
-    // Click en el botón de cancelar (puede haber múltiples, así que usamos getAllByText)
-    const cancelButtons = screen.getAllByText('Cancelar');
-    expect(cancelButtons.length).toBeGreaterThan(0);
-    // O interactúa con el primero:
-    fireEvent.click(cancelButtons[0]);
+    // Click en el botón de cancelar del formulario
+    const cancelBtn = screen.getByTestId('review-cancel-btn')
+    fireEvent.click(cancelBtn)
     
     // Debería volver al texto original
-    expect(screen.getByTestId('Escribir Quote')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTestId('write-review-btn')).toBeInTheDocument()
+    })
   })
 })

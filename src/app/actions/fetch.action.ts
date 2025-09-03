@@ -3,12 +3,12 @@
 const GOOGLE_API = 'https://www.googleapis.com/books/v1/volumes'
 
 export async function fetchBooks(query: string) {
-  const response = await fetch(`${GOOGLE_API}?q=${query}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch books')
-  }
-  const data = await response.json()
-  return data.items
+  if (!query) return [];
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch books');
+  const data = await res.json();
+  return data.items || [];
 }
 
 export async function fetchBookById(id: string) {

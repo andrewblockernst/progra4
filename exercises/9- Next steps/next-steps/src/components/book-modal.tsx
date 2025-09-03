@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { GoogleBookItem, Review } from '@/types/book'
 import { getBookReviews, fetchBookById } from '@/app/actions/reviews.action'
-import { X, Star, ExternalLink, Pen, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Star, Pen, ChevronDown, ChevronUp } from 'lucide-react'
 import ReviewForm from './review-form'
 import ReviewsList from './review-list'
+import Image from 'next/image'
 
 interface BookDetailModalProps {
     book: GoogleBookItem
@@ -138,9 +139,11 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                     <div className="w-full max-w-sm mx-auto aspect-[2/3] bg-amber-200 rounded-lg shadow-lg animate-pulse" />
                                 ) : bestImageUrl ? (
                                     <div className="relative group">
-                                        <img
+                                        <Image
                                             src={bestImageUrl}
                                             alt={volumeInfo.title}
+                                            width={200}
+                                            height={300}
                                             className="w-full max-w-sm mx-auto rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300"
                                             onError={(e) => {
                                                 // Fallback en caso de error de imagen

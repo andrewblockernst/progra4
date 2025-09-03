@@ -5,7 +5,7 @@ import { Review } from '@/types/book'
 const GOOGLE_API = 'https://www.googleapis.com/books/v1/volumes'
 
 // Simulamos una base de datos en memoria (en producción usarías una DB real)
-let reviewsDB: Review[] = [
+const reviewsDB: Review[] = [
   {
     id: '1',
     bookId: 'zyTCAlFPjgYC', // Harry Potter example

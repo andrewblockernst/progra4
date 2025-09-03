@@ -1,59 +1,33 @@
-name: Tests
+name: Test
 
 on:
-  pull_request:
-    branches: [ main, master ]
   push:
-    branches: [ main, master ]
-
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
+    branches: [ main ]
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Run tests
+        run: |
+          # comandos de tu suite de tests
+          npm ci
+          npm test
 
-    - name: Instalar dependencias
-      run: npm ci
+      - name: Upload coverage to Codecov (when token present)
+        if: success() && env.CODECOV_TOKEN != ''
+        run: |
+          # ejemplo de subida a codecov
+          bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN"
 
-    - name: Ejecutar tests
-      run: npm run test:run
-
-    - name: Ejecutar tests con cobertura
-      run: npm run test:coverage
-
-    - name: Subir cobertura a Codecov
-      uses: codecov/codecov-action@v3
-      if: ${{ success() && secrets.CODECOV_TOKEN }}
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./coverage/lcov.info
-
-    - name: Subir cobertura local (fallback)
-      if: ${{ success() && !secrets.CODECOV_TOKEN }}
-      run: |
-        echo "No CODECOV_TOKEN found — keeping coverage artifacts in workflow run."
-
-    - name: Comentar resultados en PR
-      uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request'
-      with:
-        recreate: true
-        message: |
-          ## Resultados de Tests
-
-          Todos los tests pasaron exitosamente
-
-          Ver detalles en la pestaña "Actions" arriba.
+      - name: Skip Codecov upload (no token)
+        if: success() && env.CODECOV_TOKEN == ''
+        run: |
+          echo "CODECOV_TOKEN not set — skipping coverage upload"

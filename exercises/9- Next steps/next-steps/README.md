@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# uap-web-development 
 
-## Getting Started
+## Entrega de github actions, deploy y documentación requerida
 
-First, run the development server:
+1. Build: (.github/workflows/build.yml)
+Propósito: Verifica que el proyecto se construya correctamente en pull requests, asegurando compatibilidad con múltiples versiones de Node.js.
+Triggers: Se ejecuta en push a main y en pull requests.
 
+Jobs:
+build: Corre en Ubuntu con Node.js 18.x y 20.x.
+Instala dependencias con cache.
+Ejecuta build de producción (npm run build).
+Verifica TypeScript y ESLint.
+Beneficios: Detecta errores de build temprano, garantiza compatibilidad cross-Node.
+2. Docker: (.github/workflows/docker.yml)
+Propósito: Construye y publica imágenes Docker multi-plataforma para despliegue.
+Triggers: Se ejecuta en push a main y en pull requests.
+
+Jobs:
+build-and-push: Usa Docker Buildx para crear imágenes en linux/amd64 y linux/arm64.
+Cache de layers para eficiencia.
+Publica a GitHub Container Registry (ghcr.io).
+Etiquetas: main, latest, y SHA del commit.
+Beneficios: Automatiza despliegues containerizados, soporta múltiples arquitecturas.
+3. Test: (.github/workflows/test.yml)
+Propósito: Ejecuta tests y sube cobertura, comentando resultados en pull-requests.
+Triggers: Se ejecuta en push a main y en pull requests.
+
+Jobs:
+test: Corre en Ubuntu.
+Instala dependencias.
+Ejecuta tests con cobertura (npm run test:coverage).
+Sube cobertura a Codecov (si hay token).
+Comenta resultados en pull-requests.
+Beneficios: Asegura calidad del código, tracking de cobertura, feedback automático en pull-requests.
+
+## Next Steps - Proyecto de Biblioteca
+
+### Ejecución local de código
+
+#### Requisitos Previos
+- Node.js 18+ o 20+
+- npm o yarn
+- Docker (opcional para contenedor)
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tu-usuario/tu-repo.git
+   cd tu-repo
+   ```
+
+2. Instala dependencias:
+   ```bash
+   npm install
+   ```
+
+3. Configura variables de entorno (ver sección abajo).
+
+4. Ejecuta en modo desarrollo:
+   ```bash
+   npm run dev
+   ```
+   - Abre http://localhost:3000
+
+5. Para producción local:
+   ```bash
+   npm run build
+   npm start
+   ```
+
+### Docker
+
+#### Construcción y ejecución de imagen local
+1. Construye la imagen:
+   ```bash
+   docker build -t next-steps .
+   ```
+
+2. Ejecuta el contenedor:
+   ```bash
+   docker run -p 3000:3000 next-steps
+   ```
+   - Accede en http://localhost:3000
+
+#### Usar Imagen desde GitHub Container Registry
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker run -p 3000:3000 ghcr.io/tu-usuario/tu-repo:main
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### .env.local variables de entorno
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crea un archivo `.env.local` en la raíz del proyecto con estas variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+## Base URL de la API (ejemplo)
+NEXT_PUBLIC_API_URL=https://api.example.com
 
-## Learn More
+## Token de Codecov (para CI/CD)
+CODECOV_TOKEN=tu_token_aqui
 
-To learn more about Next.js, take a look at the following resources:
+## Otras variables específicas de tu app
+DATABASE_URL=postgresql://...
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### GitHub actions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Este proyecto usa GitHub Actions tales como:
 
-## Deploy on Vercel
+- **Buildeo:** Verifica builds en PRs con múltiples versiones de Node.js.
+- **Testeo:** Ejecuta tests, genera cobertura y comenta en PRs.
+- **Docker:** Construye y publica imágenes Docker multi-plataforma.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Configuración Necesaria
+1. Agrega `CODECOV_TOKEN` como secret en Settings > Secrets (para subir cobertura).
+2. Los workflows se activan automáticamente en push/PR a `main`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+

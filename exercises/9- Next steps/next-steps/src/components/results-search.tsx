@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { GoogleBookItem } from '@/types/book'
 import SearchResultsSkeleton from './skeleton-search'
 import BookDetailModal from './book-modal'
+import Image from 'next/image'
 
 interface SearchResultsProps {
     books: GoogleBookItem[]
@@ -23,11 +24,12 @@ export default function SearchResults({ books, query, isPending }: SearchResults
             <div className="text-center py-12 bg-amber-50/80 backdrop-blur-sm rounded-lg border border-amber-200">
                 <div className="text-6xl mb-4">📚</div>
                 <p className="text-xl text-amber-700 font-semibold mb-2">
-                    No se encontraron libros para "{query}"
+                    No se encontraron libros para &quot;{query}&quot;
                 </p>
                 <p className="text-amber-600">
                     Intenta con otros términos de búsqueda o revisa los ejemplos
                 </p>
+                <p>Esto es un &quot;ejemplo&quot; de búsqueda</p>
             </div>
         )
     }
@@ -56,9 +58,11 @@ export default function SearchResults({ books, query, isPending }: SearchResults
                                 {/* Book Cover */}
                                 <div className="mb-4 flex justify-center">
                                     {book.volumeInfo.imageLinks?.thumbnail ? (
-                                        <img
+                                        <Image
                                             src={book.volumeInfo.imageLinks.thumbnail}
                                             alt={book.volumeInfo.title}
+                                            width={200}
+                                            height={300}
                                             className="h-48 w-32 object-cover rounded shadow-md hover:shadow-lg transition-shadow"
                                         />
                                     ) : (

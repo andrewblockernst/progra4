@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { GoogleBookItem, Review } from '@/types/book'
 import { getBookReviews, fetchBookById } from '@/app/actions/reviews.action'
-import { X, Star, ExternalLink, Pen, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Star, Pen, ChevronDown, ChevronUp } from 'lucide-react'
 import ReviewForm from './review-form'
 import ReviewsList from './review-list'
+import Image from 'next/image'
 
 interface BookDetailModalProps {
     book: GoogleBookItem
@@ -21,6 +22,31 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
     const [isLoadingBook, setIsLoadingBook] = useState(false)
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
 
+    const loadBookDetails = useCallback(async () => {
+        setIsLoadingBook(true)
+        try {
+            const bookDetails = await fetchBookById(book.id)
+            setDetailedBook(bookDetails)
+        } catch (error) {
+            console.error('Error loading book details:', error)
+            setDetailedBook(book) // Fallback to original book data
+        } finally {
+            setIsLoadingBook(false)
+        }
+    }, [book])
+
+    const loadReviews = useCallback(async () => {
+        setIsLoadingReviews(true)
+        try {
+            const bookReviews = await getBookReviews(book.id)
+            setReviews(bookReviews)
+        } catch (error) {
+            console.error('Error loading reviews:', error)
+        } finally {
+            setIsLoadingReviews(false)
+        }
+    }, [book.id])
+
     useEffect(() => {
         if (isOpen) {
             loadBookDetails()
@@ -33,32 +59,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
         return () => {
             document.body.style.overflow = 'unset'
         }
-    }, [isOpen, book.id])
-
-    const loadBookDetails = async () => {
-        setIsLoadingBook(true)
-        try {
-            const bookDetails = await fetchBookById(book.id)
-            setDetailedBook(bookDetails)
-        } catch (error) {
-            console.error('Error loading book details:', error)
-            setDetailedBook(book) // Fallback to original book data
-        } finally {
-            setIsLoadingBook(false)
-        }
-    }
-
-    const loadReviews = async () => {
-        setIsLoadingReviews(true)
-        try {
-            const bookReviews = await getBookReviews(book.id)
-            setReviews(bookReviews)
-        } catch (error) {
-            console.error('Error loading reviews:', error)
-        } finally {
-            setIsLoadingReviews(false)
-        }
-    }
+    }, [isOpen, book.id, loadBookDetails, loadReviews])
 
     const calculateAverageRating = () => {
         if (reviews.length === 0) return 0
@@ -138,9 +139,11 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                     <div className="w-full max-w-sm mx-auto aspect-[2/3] bg-amber-200 rounded-lg shadow-lg animate-pulse" />
                                 ) : bestImageUrl ? (
                                     <div className="relative group">
-                                        <img
+                                        <Image
                                             src={bestImageUrl}
                                             alt={volumeInfo.title}
+                                            width={200}
+                                            height={300}
                                             className="w-full max-w-sm mx-auto rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300"
                                             onError={(e) => {
                                                 // Fallback en caso de error de imagen
@@ -258,6 +261,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                             <button
                                 onClick={() => setShowReviewForm(!showReviewForm)}
                                 className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md hover:shadow-lg flex items-center gap-2"
+                                data-testid={showReviewForm ? 'cancel-review-btn' : 'write-review-btn'}
                             >
                                 <Pen size={20} />
                                 {showReviewForm ? 'Cancelar' : 'Escribir Quote'}

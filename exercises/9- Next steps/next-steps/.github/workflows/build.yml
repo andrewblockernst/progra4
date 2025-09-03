@@ -1,0 +1,43 @@
+name: Build Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Instalar dependencias
+      run: npm ci
+      
+    - name: Verificar tipos TypeScript
+      run: npm run type-check
+      
+    - name: Lint del código
+      run: npm run lint
+      
+    - name: Build de la aplicación
+      run: npm run build
+      
+    - name: Verificar que build fue exitoso
+      run: |
+        if [ ! -d ".next" ]; then
+          echo "❌ Error: Build falló - carpeta .next no existe"
+          exit 1
+        fi
+        echo "✅ Build exitoso"

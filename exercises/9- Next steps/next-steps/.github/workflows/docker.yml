@@ -24,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: franco2k3/libreria-virtual
+          images: andrewblockernst/trinitycollegelibrary
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

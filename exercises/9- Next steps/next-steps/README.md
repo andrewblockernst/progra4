@@ -73,19 +73,22 @@ Beneficios: Asegura calidad del código, tracking de cobertura, feedback automá
 #### Construcción y ejecución de imagen local
 1. Construye la imagen:
    ```bash
-   docker build -t next-steps .
+   docker build -t tuusuario/next-steps .
    ```
 
 2. Ejecuta el contenedor:
    ```bash
-   docker run -p 3000:3000 next-steps
+   docker run -p 3000:3000 tuusuario/next-steps
    ```
    - Accede en http://localhost:3000
 
-#### Usar Imagen desde GitHub Container Registry
+#### Usar Imagen desde Docker Hub
+Si ya publicaste la imagen en Docker Hub, puedes correrla así:
 ```bash
-docker run -p 3000:3000 ghcr.io/tu-usuario/tu-repo:main
+docker pull tuusuario/next-steps:latest
+docker run -p 3000:3000 tuusuario/next-steps:latest
 ```
+> Cambia `tuusuario` por tu usuario real de Docker Hub.
 
 #### .env.local variables de entorno
 
@@ -117,4 +120,4 @@ Este proyecto usa GitHub Actions tales como:
 
 
 
-##### Fin. 
+##### Fin.

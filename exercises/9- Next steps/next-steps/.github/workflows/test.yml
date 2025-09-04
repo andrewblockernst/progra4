@@ -17,6 +17,8 @@ jobs:
 
       - name: Run tests
         run: |
+          # Change to the Next.js project directory
+          cd "exercises/9- Next steps/next-steps"
           # comandos de tu suite de tests
           npm ci
           npm test
@@ -24,6 +26,7 @@ jobs:
       - name: Upload coverage to Codecov (when token present)
         if: success() && env.CODECOV_TOKEN != ''
         run: |
+          cd "exercises/9- Next steps/next-steps"
           # ejemplo de subida a codecov
           bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN"
 

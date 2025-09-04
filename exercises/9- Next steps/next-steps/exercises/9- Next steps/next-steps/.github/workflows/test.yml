@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          # comandos de tu suite de tests
+          npm ci
+          npm test
+
+      - name: Upload coverage to Codecov (when token present)
+        if: success() && env.CODECOV_TOKEN != ''
+        run: |
+          # ejemplo de subida a codecov
+          bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN"
+
+      - name: Skip Codecov upload (no token)
+        if: success() && env.CODECOV_TOKEN == ''
+        run: |
+          echo "CODECOV_TOKEN not set — skipping coverage upload"

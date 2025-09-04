@@ -82,11 +82,6 @@ Beneficios: Asegura calidad del código, tracking de cobertura, feedback automá
    ```
    - Accede en http://localhost:3000
 
-#### Usar Imagen desde GitHub Container Registry
-```bash
-docker run -p 3000:3000 ghcr.io/tu-usuario/tu-repo:main
-```
-
 #### .env.local variables de entorno
 
 Crea un archivo `.env.local` en la raíz del proyecto con estas variables:

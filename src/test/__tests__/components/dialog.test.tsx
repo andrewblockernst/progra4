@@ -15,6 +15,12 @@ vi.mock('@/app/actions/reviews.action', () => ({
   getBookReviews: vi.fn().mockResolvedValue([])
 }))
 
+// Mock de fetch para las llamadas a API de favoritos
+global.fetch = vi.fn().mockResolvedValue({
+  ok: true,
+  json: vi.fn().mockResolvedValue([])
+})
+
 describe('BookModal (Real Component)', () => {
   const mockBook = {
     id: 'test-book-id',

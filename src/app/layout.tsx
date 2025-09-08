@@ -1,34 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/providers";
+import { ReactNode } from "react";
 
-const geist = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Trinity College Library",
-  description: "Book search and reviews platform",
+  title: "Book Reviews App",
+  description: "Discover and review books",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: ReactNode;
+}) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning={true}>
-      <body
-        className={`${geist.variable} ${geistMono.variable} antialiased min-h-screen`}
-        suppressHydrationWarning={true}
-      >
-        {children}
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

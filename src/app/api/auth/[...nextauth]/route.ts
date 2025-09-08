@@ -15,7 +15,7 @@ declare module 'next-auth' {
   }
 }
 
-export default NextAuth({
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -42,10 +42,6 @@ export default NextAuth({
     }),
   ],
   session: { strategy: 'jwt' },
-  pages: {
-    signIn: '/login',
-    error: '/auth/error',
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) token.id = user.id;
@@ -59,3 +55,5 @@ export default NextAuth({
     },
   },
 });
+
+export { handler as GET, handler as POST };

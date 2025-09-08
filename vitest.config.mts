@@ -1,4 +1,3 @@
-// vitest.config.mts
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -23,7 +22,8 @@ export default defineConfig({
         '.next/',
         'src/app/globals.css',
         'src/app/layout.tsx',
-        'src/app/page.tsx'
+        'src/app/page.tsx',
+        './src/test/setup.ts',
       ],
       thresholds: {
         global: {

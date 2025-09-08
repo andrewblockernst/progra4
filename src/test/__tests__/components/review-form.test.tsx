@@ -1,4 +1,3 @@
-// src/test/__tests__/components/review-form.real.test.tsx
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@/test/utils/test-utils'
 import ReviewForm from '@/components/review-form'
@@ -7,6 +6,19 @@ import ReviewForm from '@/components/review-form'
 vi.mock('@/app/actions', () => ({
   addReview: vi.fn()
 }))
+
+// Mock dbConnect al inicio
+vi.mock('@/lib/mongodb', () => ({
+  default: vi.fn().mockResolvedValue(null),
+}));
+
+// Mock modelos si es necesario
+vi.mock('@/models/Review', () => ({
+  default: vi.fn().mockImplementation((data) => ({
+    ...data,
+    save: vi.fn().mockResolvedValue(data),
+  })),
+}));
 
 describe('ReviewForm (Real Component)', () => {
   const mockProps = {

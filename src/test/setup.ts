@@ -28,3 +28,5 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 
 // Mock para alert
 global.alert = vi.fn()
+
+process.env.MONGODB_URI = 'mongodb://mock' 

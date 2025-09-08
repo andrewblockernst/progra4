@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Star, ThumbsUp, ThumbsDown, Clock } from 'lucide-react'
 import { Review } from '@/types/book'
 import { voteReview } from '@/app/actions/reviews.action'
@@ -11,12 +11,17 @@ interface ReviewsListProps {
     onReviewsUpdate: (reviews: Review[]) => void
 }
 
-export default function ReviewsList({ reviews, isLoading, onReviewsUpdate }: ReviewsListProps) {
+export default function ReviewsList({ reviews: initialReviews, isLoading, onReviewsUpdate }: ReviewsListProps) {
+    const [reviews, setReviews] = useState<Review[]>(initialReviews);
     const [isPending, startTransition] = useTransition()
     const [votingReviewId, setVotingReviewId] = useState<string | null>(null)
 
     // Simular un ID de usuario (en producción vendría de autenticación)
     const currentUserId = 'user123'
+
+    useEffect(() => {
+        setReviews(initialReviews);
+    }, [initialReviews]);
 
     const handleVote = async (reviewId: string, voteType: 'up' | 'down') => {
         setVotingReviewId(reviewId)

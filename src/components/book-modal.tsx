@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { GoogleBookItem, Review } from '@/types/book'
 import { getBookReviews, fetchBookById } from '@/app/actions/reviews.action'
-import { X, Star, Pen, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Star, Pen, ChevronDown, ChevronUp, Heart } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import ReviewForm from './review-form'
 import ReviewsList from './review-list'
 import Image from 'next/image'
@@ -15,12 +16,15 @@ interface BookDetailModalProps {
 }
 
 export default function BookDetailModal({ book, isOpen, onClose }: BookDetailModalProps) {
+    const { data: session } = useSession()
     const [reviews, setReviews] = useState<Review[]>([])
     const [isLoadingReviews, setIsLoadingReviews] = useState(true)
     const [showReviewForm, setShowReviewForm] = useState(false)
     const [detailedBook, setDetailedBook] = useState<GoogleBookItem>(book)
     const [isLoadingBook, setIsLoadingBook] = useState(false)
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+    const [isFavorite, setIsFavorite] = useState(false)
+    const [isLoadingFavorite, setIsLoadingFavorite] = useState(false)
 
     const loadBookDetails = useCallback(async () => {
         setIsLoadingBook(true)
@@ -47,10 +51,44 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
         }
     }, [book.id])
 
+    const checkFavorite = useCallback(async () => {
+        if (!session?.user) return
+        try {
+            const res = await fetch('/api/favorites')
+            const favorites = await res.json()
+            setIsFavorite(favorites.some((fav: any) => fav.bookId === book.id))
+        } catch (error) {
+            console.error('Error checking favorite:', error)
+        }
+    }, [session, book.id])
+
+    const toggleFavorite = async () => {
+        if (!session?.user) return
+        setIsLoadingFavorite(true)
+        try {
+            if (isFavorite) {
+                await fetch(`/api/favorites?bookId=${book.id}`, { method: 'DELETE' })
+                setIsFavorite(false)
+            } else {
+                await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId: book.id })
+                })
+                setIsFavorite(true)
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error)
+        } finally {
+            setIsLoadingFavorite(false)
+        }
+    }
+
     useEffect(() => {
         if (isOpen) {
             loadBookDetails()
             loadReviews()
+            checkFavorite()
             document.body.style.overflow = 'hidden'
         } else {
             document.body.style.overflow = 'unset'
@@ -59,7 +97,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
         return () => {
             document.body.style.overflow = 'unset'
         }
-    }, [isOpen, book.id, loadBookDetails, loadReviews])
+    }, [isOpen, book.id, loadBookDetails, loadReviews, checkFavorite])
 
     const calculateAverageRating = () => {
         if (reviews.length === 0) return 0
@@ -210,6 +248,19 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                             ({reviews.length} reseña{reviews.length !== 1 ? 's' : ''})
                                         </span>
                                     </div>
+                                    {session?.user && (
+                                        <button
+                                            onClick={toggleFavorite}
+                                            disabled={isLoadingFavorite}
+                                            className={`p-2 rounded-full transition-colors ${
+                                                isFavorite
+                                                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

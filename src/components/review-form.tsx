@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { Star } from 'lucide-react'
-import { addReview } from '@/app/actions/reviews.action'
 import { Review } from '@/types/book'
+import { useSession } from 'next-auth/react'
 
 interface ReviewFormProps {
     bookId: string
@@ -12,6 +12,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFormProps) {
+    const { data: session } = useSession()
     const [userName, setUserName] = useState('')
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
@@ -31,10 +32,21 @@ export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFo
             return
         }
 
+        if (!session || !session.user) {
+            alert('Debes iniciar sesión para publicar una reseña')
+            return
+        }
+
         startTransition(async () => {
             try {
-                const newReview = await addReview(bookId, userName, rating, comment)
-                onReviewAdded(newReview)
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId, rating, comment }),
+                })
+                if (!response.ok) throw new Error('Error al guardar')
+                const review = await response.json()
+                onReviewAdded(review)
                 
                 // Reset form
                 setUserName('')
@@ -148,5 +160,3 @@ export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFo
         </div>
     )
 }
-
-// no se cual es el error a este punto de mi vida.

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 const errorMessages: Record<string, string> = {
   Configuration: 'Hay un problema con la configuración del servidor.',
@@ -11,7 +12,7 @@ const errorMessages: Record<string, string> = {
   CredentialsSignin: 'Las credenciales proporcionadas son incorrectas.',
 };
 
-export default function AuthErrorPage() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error') || 'Default';
 
@@ -55,5 +56,13 @@ export default function AuthErrorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 flex items-center justify-center"><div className="text-gray-600">Cargando...</div></div>}>
+      <AuthErrorContent />
+    </Suspense>
   );
 }

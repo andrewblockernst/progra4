@@ -55,8 +55,8 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
         if (!session?.user) return
         try {
             const res = await fetch('/api/favorites')
-            const favorites = await res.json()
-            setIsFavorite(favorites.some((fav: any) => fav.bookId === book.id))
+            const favorites: { bookId: string }[] = await res.json()
+            setIsFavorite(favorites.some((fav) => fav.bookId === book.id))
         } catch (error) {
             console.error('Error checking favorite:', error)
         }

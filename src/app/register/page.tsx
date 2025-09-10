@@ -73,8 +73,9 @@ export default function RegisterPage() {
         router.push('/');
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || 'Error al registrar usuario');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al registrar usuario';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

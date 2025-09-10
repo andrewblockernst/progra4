@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  //HABILITO OUTPUT STANDALONE PARA DOCKER
-  output: "standalone",
   images: {
     remotePatterns: [
       {

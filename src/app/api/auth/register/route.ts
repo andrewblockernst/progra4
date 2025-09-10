@@ -5,7 +5,15 @@ import dbConnect from '@/lib/mongodb';
 
 export async function POST(req: NextRequest) {
   try {
-    await dbConnect();
+    const db = await dbConnect();
+
+    // Skip database operations during build time if connection is not available
+    if (!db) {
+      return NextResponse.json(
+        { message: 'Database not available during build' },
+        { status: 503 }
+      );
+    }
 
     const { email, password, name } = await req.json();
 

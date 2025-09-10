@@ -1,0 +1,6 @@
+{
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "NEXTAUTH_SECRET": "@nextauth_secret"
+  }
+}

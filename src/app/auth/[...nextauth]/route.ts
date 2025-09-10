@@ -28,7 +28,13 @@ const handler = NextAuth({
           return null;
         }
         try {
-          await dbConnect();
+          const db = await dbConnect();
+          // Skip database operations during build time if connection is not available
+          if (!db) {
+            console.warn('Database not available during build time, skipping authentication');
+            return null;
+          }
+
           const user = await User.findOne({ email: credentials.email });
           if (user && bcrypt.compareSync(credentials.password, user.password)) {
             return { id: user._id.toString(), email: user.email, name: user.name };

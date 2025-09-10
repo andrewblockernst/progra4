@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
-const MONGODB_URI: string = process.env.MONGODB_URI;
+const MONGODB_URI: string | undefined = process.env.MONGODB_URI;
 
 interface MongooseCache {
     conn: typeof mongoose | null;
@@ -22,6 +18,12 @@ if (!cached) {
 }
 
 async function connectDB() {
+    // Skip database connection during build time if MONGODB_URI is not set
+    if (!MONGODB_URI) {
+        console.warn('MONGODB_URI not found, skipping database connection during build');
+        return null;
+    }
+
     // Usar caché en desarrollo para evitar múltiples conexiones
     if (cached!.conn) {
         return cached!.conn;

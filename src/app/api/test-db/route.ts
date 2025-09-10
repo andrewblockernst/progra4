@@ -4,7 +4,13 @@ import User from '@/models/User';
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect();
+    const db = await dbConnect();
+
+    // Skip database operations during build time if connection is not available
+    if (!db) {
+      return NextResponse.json({ message: 'Database not available during build' });
+    }
+
     console.log('Conexión exitosa a MongoDB');
 
     // Insertar un usuario de prueba (solo para demo; en producción, usa registro seguro)

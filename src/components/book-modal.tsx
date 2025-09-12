@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { GoogleBookItem, Review } from '@/types/book'
-import { getBookReviews, fetchBookById } from '@/app/actions/reviews.action'
+import { fetchBookById } from '@/app/actions/reviews.action'
 import { X, Star, Pen, ChevronDown, ChevronUp, Heart } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import ReviewForm from './review-form'
@@ -42,7 +42,11 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
     const loadReviews = useCallback(async () => {
         setIsLoadingReviews(true)
         try {
-            const bookReviews = await getBookReviews(book.id)
+            const response = await fetch(`/api/reviews?bookId=${book.id}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch reviews')
+            }
+            const bookReviews = await response.json()
             setReviews(bookReviews)
         } catch (error) {
             console.error('Error loading reviews:', error)
@@ -63,22 +67,42 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
     }, [session, book.id])
 
     const toggleFavorite = async () => {
-        if (!session?.user) return
+        if (!session?.user) {
+            alert('Debes iniciar sesión para agregar favoritos')
+            return
+        }
+
         setIsLoadingFavorite(true)
         try {
             if (isFavorite) {
-                await fetch(`/api/favorites?bookId=${book.id}`, { method: 'DELETE' })
-                setIsFavorite(false)
+                // Remover de favoritos
+                const response = await fetch(`/api/favorites?bookId=${book.id}`, {
+                    method: 'DELETE',
+                })
+                
+                if (response.ok) {
+                    setIsFavorite(false)
+                } else {
+                    throw new Error('Failed to remove favorite')
+                }
             } else {
-                await fetch('/api/favorites', {
+                // Agregar a favoritos
+                const response = await fetch('/api/favorites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bookId: book.id })
+                    body: JSON.stringify({ bookId: book.id }),
                 })
-                setIsFavorite(true)
+                
+                if (response.ok) {
+                    setIsFavorite(true)
+                } else {
+                    const error = await response.json()
+                    throw new Error(error.error || 'Failed to add favorite')
+                }
             }
         } catch (error) {
             console.error('Error toggling favorite:', error)
+            alert('Error al actualizar favorito. Intenta de nuevo.')
         } finally {
             setIsLoadingFavorite(false)
         }
@@ -139,7 +163,16 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
 
     if (!isOpen) return null
 
-    const { volumeInfo } = detailedBook
+    // Ensure detailedBook has the expected structure
+    if (!detailedBook || !detailedBook.volumeInfo) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6">
+            <p className="text-gray-600">Cargando detalles del libro...</p>
+          </div>
+        </div>
+      )
+    }    const { volumeInfo } = detailedBook
     const averageRating = calculateAverageRating()
     const bestImageUrl = getBestImageUrl()
 
@@ -156,12 +189,18 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
             />
             
             {/* Modal Content */}
-            <div className="relative bg-amber-50/80 backdrop-blur-sm rounded-lg border border-amber-200 max-w-5xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+            <div 
+                className="relative bg-amber-50/80 backdrop-blur-sm rounded-lg border border-amber-200 max-w-5xl w-full max-h-[95vh] overflow-y-auto shadow-2xl"
+                role="dialog"
+                aria-labelledby="modal-title"
+                aria-describedby="modal-description"
+            >
                 {/* Modal Header */}
                 <div className="absolute top-4 right-4 z-10">
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-amber-100 rounded-full transition-colors flex-shrink-0"
+                        aria-label="Close modal"
                     >
                         <X size={24} className="text-amber-600" />
                     </button>
@@ -214,7 +253,10 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                         {/* Book Info */}
                         <div className="lg:col-span-2 space-y-6">
                             <div>
-                                <h1 className="text-3xl lg:text-3xl font-bold text-amber-800 leading-tight">
+                                <h1 
+                                    className="text-3xl lg:text-3xl font-bold text-amber-800 leading-tight"
+                                    id="modal-title"
+                                >
                                     {volumeInfo.title}
                                 </h1>
                                 {volumeInfo.authors && (
@@ -257,6 +299,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                                     ? 'bg-red-100 text-red-600 hover:bg-red-200'
                                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                             }`}
+                                            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                                         >
                                             <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
                                         </button>
@@ -286,7 +329,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                             </button>
                                         )}
                                     </div>
-                                    <div className="text-amber-700 leading-relaxed">
+                                    <div className="text-amber-700 leading-relaxed" id="modal-description">
                                         <div className={`transition-all duration-300 ${isDescriptionExpanded ? 'max-h-none' : 'max-h-32 overflow-hidden'}`}>
                                             {(isDescriptionExpanded ? description.replace(/<[^>]*>/g, '') : preview)
                                                 .split('\n')
@@ -313,6 +356,7 @@ export default function BookDetailModal({ book, isOpen, onClose }: BookDetailMod
                                 onClick={() => setShowReviewForm(!showReviewForm)}
                                 className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md hover:shadow-lg flex items-center gap-2"
                                 data-testid={showReviewForm ? 'cancel-review-btn' : 'write-review-btn'}
+                                aria-label={showReviewForm ? 'Cancel writing review' : 'Write a review'}
                             >
                                 <Pen size={20} />
                                 {showReviewForm ? 'Cancelar' : 'Escribir Quote'}

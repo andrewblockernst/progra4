@@ -1,0 +1,206 @@
+# CI/CD Configuration for Testing
+
+## GitHub Actions Workflow
+
+```yaml
+name: Tests
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Type check
+      run: npm run type-check
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Run tests with coverage
+      run: npm run test:ci
+
+    - name: Check coverage thresholds
+      run: npm run coverage:check
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: test-results.json
+```
+
+## Local CI Simulation
+
+Para simular el proceso de CI/CD localmente:
+
+```bash
+# 1. Verificar tipos
+npm run type-check
+
+# 2. Ejecutar linter
+npm run lint
+
+# 3. Ejecutar pruebas con cobertura
+npm run test:ci
+
+# 4. Verificar umbrales de cobertura
+npm run coverage:check
+```
+
+## Umbrales de Calidad
+
+### Cobertura Mínima Requerida
+- **Branches**: 75%
+- **Functions**: 80%
+- **Lines**: 80%
+- **Statements**: 80%
+
+### Métricas Adicionales
+- **Test Execution Time**: < 30 segundos
+- **Bundle Size**: < 500KB (gzipped)
+- **Lighthouse Score**: > 90
+
+## Reportes de Cobertura
+
+Los reportes se generan automáticamente en:
+
+```
+coverage/
+├── html/
+│   └── index.html      # Reporte visual interactivo
+├── coverage-summary.json  # Resumen JSON
+├── lcov.info          # Formato LCOV para CI/CD
+└── clover.xml         # Formato Clover
+```
+
+## Configuración de Codecov
+
+```yaml
+# codecov.yml
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+  ignore:
+    - "src/test/**"
+    - "**/*.config.js"
+    - "**/*.config.ts"
+```
+
+## Scripts de CI
+
+### Pre-commit Hook
+```bash
+#!/bin/sh
+npm run type-check
+npm run lint
+npm run test:run
+```
+
+### Pre-push Hook
+```bash
+#!/bin/sh
+npm run test:coverage
+npm run coverage:check
+```
+
+## Monitoreo de Calidad
+
+### Métricas a Monitorear
+- Cobertura de código
+- Tiempo de ejecución de pruebas
+- Número de tests fallidos
+- Complejidad ciclomática
+- Duplicación de código
+
+### Alertas
+- Cobertura por debajo del 75%
+- Tests fallando
+- Errores de linting críticos
+- Errores de TypeScript
+
+## Optimización de CI
+
+### Cache Strategy
+```yaml
+- uses: actions/cache@v3
+  with:
+    path: |
+      ~/.npm
+      .next/cache
+    key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}
+```
+
+### Parallel Testing
+```bash
+# Ejecutar tests en paralelo
+npm run test:run -- --shard=1/2
+npm run test:run -- --shard=2/2
+```
+
+## Troubleshooting CI
+
+### Problemas Comunes
+
+1. **Tests fallan en CI pero pasan localmente**
+   - Verificar versiones de Node.js
+   - Revisar variables de entorno
+   - Comprobar dependencias
+
+2. **Cobertura inconsistente**
+   - Limpiar cache: `npm run test -- --clearCache`
+   - Verificar configuración de Vitest
+   - Revisar archivos excluidos
+
+3. **Tiempos de ejecución largos**
+   - Optimizar mocks
+   - Paralelizar tests
+   - Revisar dependencias pesadas
+
+### Comandos de Debug
+
+```bash
+# Ejecutar con output detallado
+npm run test:run -- --reporter=verbose
+
+# Ejecutar tests específicos
+npm run test:auth
+npm run test:db
+
+# Ver configuración de Vitest
+npx vitest --help
+```

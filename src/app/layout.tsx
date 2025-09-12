@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Book Reviews App",
+  title: "Trinity College Library",
   description: "Discover and review books",
 };
 

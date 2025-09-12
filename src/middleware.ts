@@ -11,4 +11,4 @@ export default withAuth(
   }
 );
 
-export const config = { matcher: ['/protected/:path*', '/profile/:path*', '/api/favorites/:path*'] };
+export const config = { matcher: ['/protected/:path*', '/profile/:path*', '/api/reviews/:path*', '/api/favorites/:path*'] };

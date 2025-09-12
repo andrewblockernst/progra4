@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from 'react'
 import { Star, ThumbsUp, ThumbsDown, Clock } from 'lucide-react'
 import { Review } from '@/types/book'
-import { voteReview } from '@/app/actions/reviews.action'
+import { useSession } from 'next-auth/react'
 
 interface ReviewsListProps {
     reviews: Review[]
@@ -15,9 +15,10 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
     const [reviews, setReviews] = useState<Review[]>(initialReviews);
     const [isPending, startTransition] = useTransition()
     const [votingReviewId, setVotingReviewId] = useState<string | null>(null)
+    const { data: session } = useSession()
 
-    // Simular un ID de usuario (en producción vendría de autenticación)
-    const currentUserId = 'user123'
+    // Use actual user ID from session
+    const currentUserId = session?.user?.id || 'anonymous'
 
     useEffect(() => {
         setReviews(initialReviews);
@@ -28,13 +29,21 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
         
         startTransition(async () => {
             try {
-                const updatedReview = await voteReview(reviewId, currentUserId, voteType)
-                if (updatedReview) {
+                const response = await fetch(`/api/reviews/${reviewId}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voteType }),
+                })
+                
+                if (response.ok) {
+                    const updatedReview = await response.json()
                     onReviewsUpdate(
                         reviews.map(review => 
                             review.id === reviewId ? updatedReview : review
                         )
                     )
+                } else {
+                    console.error('Error voting on review')
                 }
             } catch (error) {
                 console.error('Error voting on review:', error)
@@ -95,8 +104,11 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
     return (
         <div className="space-y-4">
             {reviews.map((review) => {
-                const userVote = review.userVotes[currentUserId]
-                const score = review.upvotes - review.downvotes
+                const userVote = review.userVotes?.[currentUserId] || null
+                const upvotes = review.upvotes || 0
+                const downvotes = review.downvotes || 0
+                const score = upvotes - downvotes
+                const userName = review.userName || 'Usuario Anónimo'
                 
                 return (
                     <div 
@@ -108,12 +120,12 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
                                     <span className="text-amber-800 font-semibold text-lg">
-                                        {review.userName.charAt(0).toUpperCase()}
+                                        {userName.charAt(0).toUpperCase()}
                                     </span>
                                 </div>
                                 <div>
                                     <h5 className="font-semibold text-amber-800">
-                                        {review.userName}
+                                        {userName}
                                     </h5>
                                     <div className="flex items-center gap-2 text-xs text-amber-600">
                                         <Clock size={12} />
@@ -156,7 +168,7 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
                                     }`}
                                 >
                                     <ThumbsUp size={14} />
-                                    <span>{review.upvotes}</span>
+                                    <span>{upvotes}</span>
                                 </button>
                                 
                                 <button
@@ -169,7 +181,7 @@ export default function ReviewsList({ reviews: initialReviews, isLoading, onRevi
                                     }`}
                                 >
                                     <ThumbsDown size={14} />
-                                    <span>{review.downvotes}</span>
+                                    <span>{downvotes}</span>
                                 </button>
                             </div>
 

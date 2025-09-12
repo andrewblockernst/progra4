@@ -87,18 +87,17 @@ export async function fetchBookById(id: string) {
 }
 
 export async function getBookReviews(bookId: string): Promise<Review[]> {
-  // Simular delay de red
-  await new Promise(resolve => setTimeout(resolve, 300))
-  
-  return reviewsDB
-    .filter(review => review.bookId === bookId)
-    .sort((a, b) => {
-      // Ordenar por score (upvotes - downvotes) y luego por fecha
-      const scoreA = a.upvotes - a.downvotes
-      const scoreB = b.upvotes - b.downvotes
-      if (scoreA !== scoreB) return scoreB - scoreA
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    })
+  try {
+    const response = await fetch(`/api/reviews?bookId=${bookId}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews')
+    }
+    const reviews = await response.json()
+    return reviews
+  } catch (error) {
+    console.error('Error fetching book reviews:', error)
+    return []
+  }
 }
 
 export async function addReview(
@@ -107,20 +106,21 @@ export async function addReview(
   rating: number, 
   comment: string
 ): Promise<Review> {
-  const newReview: Review = {
-    id: Math.random().toString(36).substr(2, 9),
-    bookId,
-    userName: userName.trim() || 'Usuario Anónimo',
-    rating: Math.max(1, Math.min(5, rating)), // Ensure 1-5 range
-    comment: comment.trim(),
-    createdAt: new Date(),
-    upvotes: 0,
-    downvotes: 0,
-    userVotes: {}
+  try {
+    const response = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookId, rating, comment }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to add review')
+    }
+    const review = await response.json()
+    return review
+  } catch (error) {
+    console.error('Error adding review:', error)
+    throw error
   }
-  
-  reviewsDB.push(newReview)
-  return newReview
 }
 
 export async function voteReview(
@@ -130,6 +130,11 @@ export async function voteReview(
 ): Promise<Review | null> {
   const review = reviewsDB.find(r => r.id === reviewId)
   if (!review) return null
+  
+  // Initialize optional properties if they don't exist
+  if (!review.upvotes) review.upvotes = 0
+  if (!review.downvotes) review.downvotes = 0
+  if (!review.userVotes) review.userVotes = {}
   
   const previousVote = review.userVotes[userId]
   

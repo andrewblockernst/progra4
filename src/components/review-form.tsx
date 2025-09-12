@@ -13,7 +13,6 @@ interface ReviewFormProps {
 
 export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFormProps) {
     const { data: session } = useSession()
-    const [userName, setUserName] = useState('')
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
     const [hoveredRating, setHoveredRating] = useState(0)
@@ -49,7 +48,6 @@ export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFo
                 onReviewAdded(review)
                 
                 // Reset form
-                setUserName('')
                 setRating(0)
                 setComment('')
             } catch (error) {
@@ -64,22 +62,6 @@ export default function ReviewForm({ bookId, onReviewAdded, onCancel }: ReviewFo
             <h4 className="text-xl font-semibold text-amber-800 mb-4">Escribir una reseña</h4>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-                {/* User Name */}
-                <div>
-                    <label htmlFor="userName" className="block text-sm font-medium text-amber-800 mb-1">
-                        Tu nombre (opcional)
-                    </label>
-                    <input
-                        type="text"
-                        id="userName"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        placeholder="Nombre de usuario"
-                        className="w-full p-3 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                        maxLength={50}
-                    />
-                </div>
-
                 {/* Rating */}
                 <div>
                     <label className="block text-sm font-medium text-amber-800 mb-2">

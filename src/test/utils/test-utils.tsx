@@ -31,3 +31,5 @@ export * from '@testing-library/react'
 
 // Mantén la función render original
 export { customRender as render }
+
+// A ver que onda...

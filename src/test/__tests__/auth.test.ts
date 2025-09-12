@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import bcrypt from 'bcryptjs';
-import { NextRequest } from 'next/server';
 import User from '@/models/User';
-import { authOptions } from '@/lib/auth';
 
 // Mock DB connection
 vi.mock('@/lib/mongodb', () => ({
@@ -100,7 +98,8 @@ describe('Authentication System', () => {
       };
 
       const mockUser = { ...userData, _id: 'user_id_123' };
-      (User.create as any).mockResolvedValue(mockUser);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(User.create).mockResolvedValue(mockUser as any);
 
       const user = await User.create(userData);
       expect(user.email).toBe(userData.email);

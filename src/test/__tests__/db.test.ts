@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import mongoose from 'mongoose';
 import Review from '@/models/Review';
 import User from '@/models/User';
 import connectDB from '@/lib/mongodb';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // Mock completo de mongoose
 vi.mock('mongoose', () => ({
@@ -385,3 +386,4 @@ describe('Database Operations', () => {
     });
   });
 });
+/* eslint-enable @typescript-eslint/no-explicit-any */

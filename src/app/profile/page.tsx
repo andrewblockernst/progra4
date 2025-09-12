@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Review from '@/models/Review';
@@ -91,9 +92,11 @@ export default async function ProfilePage() {
                     <div key={`review-${review.id}`} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-3 mb-3">
                         {review.bookInfo.thumbnail && (
-                          <img
+                          <Image
                             src={review.bookInfo.thumbnail}
                             alt={review.bookInfo.title}
+                            width={48}
+                            height={64}
                             className="w-12 h-16 object-cover rounded shadow-sm"
                           />
                         )}
@@ -153,9 +156,11 @@ export default async function ProfilePage() {
                     <div key={`favorite-${fav.id}`} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-3">
                         {fav.bookInfo.thumbnail && (
-                          <img
+                          <Image
                             src={fav.bookInfo.thumbnail}
                             alt={fav.bookInfo.title}
+                            width={40}
+                            height={56}
                             className="w-10 h-14 object-cover rounded shadow-sm"
                           />
                         )}

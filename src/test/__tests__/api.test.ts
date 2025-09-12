@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 
 // Mock NextAuth
@@ -55,19 +54,7 @@ describe('API Routes', () => {
           user: { id: 'user_123', email: 'test@example.com' },
         };
 
-        const mockReviews = [
-          {
-            _id: 'review_1',
-            userId: 'user_123',
-            bookId: 'book_456',
-            rating: 5,
-            comment: 'Great book!',
-            userName: 'Test User',
-            createdAt: new Date(),
-          },
-        ];
-
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         // Mock the request
         const mockRequest = {
@@ -80,26 +67,7 @@ describe('API Routes', () => {
       });
 
       it('should return book reviews when bookId provided', async () => {
-        const mockReviews = [
-          {
-            _id: 'review_1',
-            userId: 'user_123',
-            bookId: 'book_456',
-            rating: 5,
-            comment: 'Great book!',
-            userName: 'Test User',
-            createdAt: new Date(),
-          },
-          {
-            _id: 'review_2',
-            userId: 'user_456',
-            bookId: 'book_456',
-            rating: 4,
-            comment: 'Good book!',
-            userName: 'Another User',
-            createdAt: new Date(),
-          },
-        ];
+        vi.mocked(getServerSession).mockResolvedValue(null);
 
         // Mock the request with bookId
         const mockRequest = {
@@ -115,7 +83,7 @@ describe('API Routes', () => {
       });
 
       it('should return 401 for unauthenticated user without bookId', async () => {
-        (getServerSession as any).mockResolvedValue(null);
+        vi.mocked(getServerSession).mockResolvedValue(null);
 
         const mockRequest = {
           url: 'http://localhost:3000/api/reviews',
@@ -139,7 +107,7 @@ describe('API Routes', () => {
           comment: 'This is an excellent book!',
         };
 
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         const mockRequest = {
           method: 'POST',
@@ -157,7 +125,7 @@ describe('API Routes', () => {
       });
 
       it('should return 401 for unauthenticated user', async () => {
-        (getServerSession as any).mockResolvedValue(null);
+        vi.mocked(getServerSession).mockResolvedValue(null);
 
         const mockRequest = {
           method: 'POST',
@@ -281,7 +249,7 @@ describe('API Routes', () => {
           { bookId: 'book_2', userId: 'user_123' },
         ];
 
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         expect(mockSession.user.id).toBe('user_123');
         expect(mockFavorites).toHaveLength(2);
@@ -289,7 +257,7 @@ describe('API Routes', () => {
       });
 
       it('should return 401 for unauthenticated user', async () => {
-        (getServerSession as any).mockResolvedValue(null);
+        vi.mocked(getServerSession).mockResolvedValue(null);
 
         // In a real scenario, this would return 401
         expect(true).toBe(true); // Placeholder assertion
@@ -306,7 +274,7 @@ describe('API Routes', () => {
           bookId: 'book_456',
         };
 
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         expect(mockSession.user.id).toBe('user_123');
         expect(favoriteData.bookId).toBe('book_456');
@@ -326,7 +294,7 @@ describe('API Routes', () => {
           bookId: 'book_456', // Same book
         };
 
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         expect(existingFavorite.bookId).toBe(newFavorite.bookId);
         expect(existingFavorite.userId).toBe(mockSession.user.id);
@@ -343,7 +311,7 @@ describe('API Routes', () => {
           bookId: 'book_456',
         };
 
-        (getServerSession as any).mockResolvedValue(mockSession);
+        vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
         expect(mockSession.user.id).toBe('user_123');
         expect(favoriteToRemove.bookId).toBe('book_456');

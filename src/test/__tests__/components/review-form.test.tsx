@@ -53,6 +53,7 @@ describe('ReviewForm Component', () => {
     })
 
     // Setup successful fetch by default
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(global.fetch as any).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ id: 'new-review-id' })
@@ -227,6 +228,7 @@ describe('ReviewForm Component', () => {
     })
 
     it('should handle submission errors', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(global.fetch as any).mockRejectedValue(new Error('Network error'))
 
       render(<ReviewForm {...mockProps} />)

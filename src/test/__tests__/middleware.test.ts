@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // Mock NextAuth
 vi.mock('next-auth', () => ({
@@ -230,3 +231,4 @@ describe('Authorization Middleware', () => {
     });
   });
 });
+/* eslint-enable @typescript-eslint/no-explicit-any */

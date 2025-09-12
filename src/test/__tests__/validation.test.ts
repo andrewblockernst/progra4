@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import { z } from 'zod';
 
 // Mock zod
 vi.mock('zod', () => ({
@@ -25,11 +24,6 @@ vi.mock('zod', () => ({
 
 describe('Data Validation', () => {
   describe('Review Validation', () => {
-    const reviewSchema = z.object({
-      bookId: z.string().min(1, 'Book ID is required'),
-      rating: z.number().min(1).max(5, 'Rating must be between 1 and 5'),
-      comment: z.string().min(10, 'Comment must be at least 10 characters'),
-    });
 
     it('should validate valid review data', () => {
       const validReview = {
@@ -107,11 +101,6 @@ describe('Data Validation', () => {
   });
 
   describe('User Validation', () => {
-    const userSchema = z.object({
-      email: z.string().email('Invalid email format'),
-      password: z.string().min(8, 'Password must be at least 8 characters'),
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-    });
 
     it('should validate valid user data', () => {
       const validUser = {

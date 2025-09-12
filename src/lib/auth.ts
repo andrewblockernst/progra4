@@ -1,7 +1,8 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions, Session, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import User from '@/models/User';
+import UserModel from '@/models/User';
 import dbConnect from '@/lib/mongodb';
 
 declare module 'next-auth' {
@@ -35,7 +36,7 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          const user = await User.findOne({ email: credentials.email });
+          const user = await UserModel.findOne({ email: credentials.email });
           if (user && bcrypt.compareSync(credentials.password, user.password)) {
             return { id: user._id.toString(), email: user.email, name: user.name };
           }
@@ -67,11 +68,11 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user }: { token: JWT; user: User }) {
       if (user) token.id = user.id;
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token.id) {
         session.user.id = token.id as string;
       }
